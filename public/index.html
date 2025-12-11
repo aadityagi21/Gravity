@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #f0f0f0;
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #1f1f1f;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #da1414;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #f0f0f0;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #da1414;
+            transform: scale(1.1);
+        }
+
+        /* Hamburger menu button */
+        .menu-btn {
+            display: none;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Mobile menu hidden initially */
+        #mobileMenu {
+            display: none;
+            flex-direction: column;
+            background: #1f1f1f;
+            padding: 20px;
+        }
+
+        #mobileMenu a {
+            color: #fff;
+            padding: 10px 0;
+            text-decoration: none;
+            border-bottom: 1px solid #333;
+        }
+
+        #mobileMenu a:hover {
+            color: #da1414;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #da1414;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            background: #da1414;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Upload Section */
+        #uploadSection {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        #uploadForm {
+            margin: 20px 0;
+        }
+
+        #uploadForm input[type="file"] {
+            padding: 10px;
+        }
+
+        #uploadForm button {
+            padding: 10px 20px;
+            background: #da1414;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #uploadForm button:hover {
+            transform: scale(1.05);
+        }
+
+        .file-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .file-section input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .file-section ul {
+            list-style: none;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .file-section li {
+            padding: 10px;
+            background: #1f1f1f;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #1f1f1f;
+            margin-top: 50px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            nav ul {
+                display: none;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 10px 24px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+                max-width: 90%;
+            }
+
+            .btn {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById("mobileMenu");
+            if (menu.style.display === "flex") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "flex";
+            }
+        }
+
+        // Upload functionality
+        document.addEventListener("DOMContentLoaded", function () {
+            const uploadForm = document.getElementById("uploadForm");
+            const fileInput = document.getElementById("fileInput");
+            const fileList = document.getElementById("fileList");
+            const searchBar = document.getElementById("searchBar");
+
+            let filesArray = [];
+
+            uploadForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const file = fileInput.files[0];
+                if (!file) return alert("Please select a file!");
+                filesArray.push(file.name);
+                renderFiles();
+                uploadForm.reset();
+            });
+
+            function renderFiles() {
+                fileList.innerHTML = "";
+                filesArray.forEach(f => {
+                    const li = document.createElement("li");
+                    li.textContent = f;
+                    fileList.appendChild(li);
+                });
+            }
+
+            searchBar.addEventListener("input", function () {
+                const filter = searchBar.value.toLowerCase();
+                const lis = fileList.getElementsByTagName("li");
+                Array.from(lis).forEach(li => {
+                    if (li.textContent.toLowerCase().includes(filter)) {
+                        li.style.display = "";
+                    } else {
+                        li.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">Gravity</div>
+
+        <!-- Desktop Menu -->
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#uploadSection">Upload</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <!-- Mobile Menu Button -->
+        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    </nav>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobileMenu">
+        <a href="#home" onclick="toggleMenu()">Home</a>
+        <a href="#about" onclick="toggleMenu()">About</a>
+        <a href="#services" onclick="toggleMenu()">Services</a>
+        <a href="#uploadSection" onclick="toggleMenu()">Upload</a>
+        <a href="#contact" onclick="toggleMenu()">Contact</a>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+        <h1>Welcome to Gravity</h1>
+        <p>In this website you can upload any videos, PDFs, images. Let's give something to this Gravity.</p>
+        <a href="#uploadSection"><button class="btn">Get Started</button></a>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" style="padding: 100px 20px; text-align: center;">
+        <h2 style="color:#04b112;">About Us</h2>
+        <p style="max-width:700px; margin: 20px auto;">
+            We create websites that give you complete freedom. Upload whatever you want.
+        </p>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" style="padding: 100px 20px; background:#1f1f1f; text-align:center;">
+        <h2 style="color:#04b112;">Our Services</h2>
+        <p style="max-width:700px; margin: 20px auto;">
+            Content Uploading | Free Content | Branding
+        </p>
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="uploadSection">
+        <h1>Upload Your Video, File, etc.</h1>
+        <form action="" id="uploadForm">
+            <input type="file" id="fileInput" name="file" accept=".pdf,video/*,image/*">
+            <button type="submit">Upload</button>
+        </form>
+
+        <div class="file-section">
+            <h2>All Uploaded Files</h2>
+            <input type="text" id="searchBar" placeholder="Search files..." />
+            <ul id="fileList"></ul>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" style="padding: 100px 20px; text-align: center;">
+        <h2 style="color:#04b112;">Contact Us</h2>
+        <p style="max-width:700px; margin: 20px auto;">
+            Email: tyagilabs@gmail.com | Phone: +91 9528843910
+        </p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        &copy; 2025 Gravity. All Rights Reserved.
+    </footer>
+
+</body>
+
+</html>
